@@ -1,12 +1,9 @@
-import express, { Request, Response, Application } from "express";
-import fetch from "node-fetch";
-import cors from "cors";
-import { main } from "./simple-zkapp-berkeley";
-
-const dotenv = require("dotenv");
-
-// For env File
+import dotenv from "dotenv";
 dotenv.config();
+
+import express, { Request, Response, Application } from "express";
+import cors from "cors";
+import { sendPayment } from "./faucet";
 
 const app: Application = express();
 const port = process.env.PORT || 8000;
@@ -22,12 +19,19 @@ app.post("/", async (req: Request, res: Response) => {
   try {
     const { address } = req.body;
 
-    await main();
+    if (!address) {
+      throw new Error("Address cannot be null");
+    }
+
+    const { errors, data } = await sendPayment(address);
+    if (errors.length > 0) {
+      throw new Error(JSON.stringify(errors));
+    }
 
     res.send("Successfully sent").status(200);
   } catch (e: any) {
-    console.error(e.message);
-    res.send(e.message).status(500);
+    console.error(e);
+    res.send("Error occured: " + e.message).status(500);
   }
 });
 
