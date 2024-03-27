@@ -19,10 +19,7 @@ export async function sendPayment(address: string) {
     { publicKey: keypair.publicKey }
   );
 
-  if (
-    accountNonceResponse.errors ||
-    !accountNonceResponse.data?.account?.nonce
-  ) {
+  if (accountNonceResponse.errors) {
     throw new Error("Fetching account nonce failed");
   }
 
@@ -30,9 +27,9 @@ export async function sendPayment(address: string) {
     {
       to: address,
       from: keypair.publicKey,
-      amount: Number(process.env.ZEKO_FAUCET_SEND_AMOUNT || 10),
+      amount: Number(process.env.ZEKO_FAUCET_SEND_AMOUNT || 1_000_000_000),
       fee: 1,
-      nonce: accountNonceResponse.data.account.nonce,
+      nonce: accountNonceResponse.data?.account?.nonce || 0,
     },
     keypair.privateKey
   );
@@ -52,7 +49,7 @@ export async function sendPayment(address: string) {
   );
 
   if (sendPaymentResponse.errors) {
-    throw new Error(JSON.stringify(sendPaymentResponse.er));
+    throw new Error(JSON.stringify(sendPaymentResponse.errors));
   }
 
   console.log(sendPaymentResponse.data);
