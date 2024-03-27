@@ -23,10 +23,7 @@ app.post("/", async (req: Request, res: Response) => {
       throw new Error("Address cannot be null");
     }
 
-    const { errors, data } = await sendPayment(address);
-    if (errors.length > 0) {
-      throw new Error(JSON.stringify(errors));
-    }
+    await sendPayment(address);
 
     res.send("Successfully sent").status(200);
   } catch (e: any) {

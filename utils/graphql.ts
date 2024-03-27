@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 
-async function fetchGraphQL(
+export default async function fetchGraphQL(
   operationsDoc: string,
   operationName: string,
   variables: Record<string, any>
@@ -21,15 +21,16 @@ async function fetchGraphQL(
   return await result.json();
 }
 
-export const sendPaymentDoc = (
-  data: Record<string, any>,
-  signature: Record<string, any>
-) => `
-  mutation SendPayment {
-    sendPayment(input: {fee: "${data.fee}", amount: "${data.amount}", to: "${data.to}", from: "${data.from}", nonce: "${data.nonce}"}, signature: {field: "${signature.field}", scalar: "${signature.scalar}"})
+export const sendPaymentDoc = `
+  mutation SendPayment($input: SendPaymentInput!, $signature: SignatureInput!) {
+    sendPayment(input: $input, signature: $signature)
   }
 `;
 
-export default function executeMutation(operationsDoc: string) {
-  return fetchGraphQL(operationsDoc, "SendPayment", {});
-}
+export const getAccountNonceDoc = `
+  query GetAccountNonce($publicKey: String!) {
+    account(publicKey: $publicKey) {
+      nonce
+    }
+  }
+`;
