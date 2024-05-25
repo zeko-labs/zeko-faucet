@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import express, { Request, Response, Application } from "express";
 import cors from "cors";
 import { sendPayment } from "./faucet";
